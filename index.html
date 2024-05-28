@@ -5,8 +5,6 @@
     <!-- Load the AngularJS Library -->
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <script>
-      // JavaScript code goes here
-
       // Initialize the AngularJS module and controller
       angular.module("custom-webapp-ui", []).controller('CustomUIController', function CustomUIController($scope) {
         // Initialize the user object
@@ -29,17 +27,49 @@
         // Attach the saveData function to the MainButton click event
         mainButton.onClick($scope.saveData);
       });
-
     </script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      .input-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      input[type="text"],
+      input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+    </style>
   </head>
   <body ng-controller="CustomUIController">
-    <div>
+    <div class="input-group">
       <label for="name">Name:</label>
       <input type="text" id="name" ng-model="user.name">
     </div>
-    <div>
+    <div class="input-group">
       <label for="age">Age:</label>
-      <input type="number" id="age" ng-model="user.age">
+      <input type="text" id="age" ng-model="user.age">
     </div>
     <button ng-click="saveData()">Save</button>
   </body>
