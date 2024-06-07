@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="custom-webapp-ui">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Web App UI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script>
+        angular.module("custom-webapp-ui", []).controller('CustomUIController', function CustomUIController($scope) {
+            $scope.user = {
+                name: "",
+                phone: "",
+                email: "",
+                address: "",
+                address_shop: "",
+                note: ""
+            };
+
+            $scope.selectedOption = '';
+
+            const mainButton = window.Telegram.WebApp.MainButton;
+            mainButton.text = "Đặt hàng";
+            mainButton.enable();
+            mainButton.show();
+
+            $scope.saveData = function() {
+                if (validateForm()) {
+                    const userData = JSON.stringify($scope.user);
+                    window.Telegram.WebApp.sendData(userData);
+                    alert('Đã gửi thông tin đặt hàng!');
+                }
+            };
+
+            mainButton.onClick($scope.saveData);
+
+            $scope.selectShippingOption = function(option) {
+                $scope.selectedOption = option;
+
+                if (option === 'address') {
+                    document.getElementById('address-section').classList.remove('hidden');
+                    document.getElementById('shop-section').classList.add('hidden');
+                    $scope.user.address_shop = ''; // Reset giá trị của address_shop
+                } else {
+                    document.getElementById('shop-section').classList.remove('hidden');
+                    document.getElementById('address-section').classList.add('hidden');
+                    if (option === 'shop') {
+                        // Cập nhật giá trị của address_shop khi chọn 'Mua hàng tại shop'
+                        $scope.user.address_shop = '50 Nguyễn Cư Trinh, phường Phạm Ngũ Lão, quận 1 tp Hồ Chí Minh';
+                    } else {
+                        // Reset giá trị của address_shop khi chọn 'Giao hàng'
+                        $scope.user.address_shop = '';
+                    }
+                }
+            };
+
+
+            function validateForm() {
+                var name = $scope.user.name.trim();
+                var phone = $scope.user.phone.trim();
+                var email = $scope.user.email.trim();
+                var address = $scope.user.address.trim();
+
+                if (name === '' || phone === '') {
+                    alert("Họ và tên và số điện thoại là bắt buộc.");
+                    return false;
+                }
+
+                if ($scope.selectedOption === '') {
+                    alert("Vui lòng chọn 'Giao hàng' hoặc 'Mua hàng tại shop' trước khi nhấn Submit.");
+                    return false;
+                } else if ($scope.selectedOption === 'address' && address === '') {
+                    alert("Vui lòng nhập địa chỉ giao hàng.");
+                    return false;
+                }
+
+                return true;
+            }
+        });
+    </script>
+    <style>
+        body {
+            background-color: #fff;
+            /* Màu nền trắng */
+        }
+
+        .centered-text {
+            font-size: 6vw;
+            text-align: center;
+        }
+
+        .form_group {
+            margin-bottom: 4vw;
+        }
+
+        .form_label {
+            font-size: 5vw;
+        }
+
+        .form_input {
+            font-size: 3.5vw;
+            width: 100%;
+            padding: 4vw;
+            box-sizing: border-box;
+        }
+
+        .submit-button {
+            display: block;
+            width: 100%;
+            padding: 4vw;
+            font-size: 5vw;
+            background-color: #87b1db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .wrapper input[type="checkbox"] {
+            display: inline-block;
+            vertical-align: middle;
+            transform: scale(3);
+            /* Thay đổi kích thước của checkbox */
+            margin-right: 3vw;
+            /* Khoảng cách giữa checkbox và văn bản */
+        }
+
+        .wrapper p {
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body ng-controller="CustomUIController">
+    <h5 class="centered-text">Thông tin đặt hàng</h5>
+    <form>
+        <div class="form_group">
+            <label for="name" class="form_label">1. Họ và tên<span style="color: red;">*</span></label>
+            <input type="text" id="name" name="name" class="form_input" ng-model="user.name" required>
+        </div>
+        <div class="form_group">
+            <label for="phone" class="form_label">2. Số điện thoại<span style="color: red;">*</span></label>
+            <input type="text" id="phone" name="phone" class="form_input" ng-model="user.phone" required>
+        </div>
+        <div class="form_group">
+            <label for="email" class="form_label">3. Email (nếu có)</label>
+            <input type="text" id="email" name="email" class="form_input" ng-model="user.email">
+        </div>
+
+        <h3 class="centered-text">Phương thức nhận hàng</h3>
+        <button type="button" id="ship-to-address" class="submit-button" ng-click="selectShippingOption('address')">Nhận hàng tại nhà</button>
+        <div id="address-section" class="form_group hidden">
+            <label for="address" class="form_label">Địa chỉ giao hàng</label>
+            <input type="text" id="address" name="address" class="form_input" ng-model="user.address">
+            <h3 style="color: red;"> Lưu ý giao hàng (C.O.D)</h3>
+            <p style="font-size: 3.8vw;">* Giao hàng miễn phí cách của hàng 3km</p>
+            <p style="font-size: 3.8vw;">* Phí giao hàng từ 5 - 10km: 50.000đ và tên 10km phí giao hàng mặc định là 80.000đ</p>
+        </div>
+        <p> </p>
+        <button type="button" id="buy-at-shop" class="submit-button" ng-click="selectShippingOption('shop')">Nhận hàng tại shop</button>
+
+        <div id="shop-section" class="form_group hidden">
+            <label for="shop" class="form_label">Địa chỉ shop</label>
+            <p style="font-size: 4vw; display: block; text-align: center;padding: 10px;text-decoration: underline;">
+                CÔNG TY TNHH TMDV TIN HỌC LONG BÌNH
+            </p>
+            <p style="font-size: 4vw" id="address_shop" name="address_shop" ng-model="user.address_shop">50 Nguyễn Cư Trinh, phường Phạm Ngũ Lão, quận 1 tp Hồ Chí Minh</p>
+        </div>
+
+        <div class="form_group">
+        <label for="note" class="form_label">Ghi chú</label>
+        <textarea id="note" name="note" class="form_input" ng-model="user.note"></textarea>
+        </div>
+        </form>
+
+</body>
+</html>
